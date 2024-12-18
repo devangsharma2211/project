@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <h1>Welcome, <%= teacher.name %> - CC of <%= teacher.branch %> <%= teacher.year %> year, Section <%= teacher.section %></h1>
+
+  <table border="1">
+    <thead>
+      <tr>
+        <th>Serial No.</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Branch</th>
+        <th>Section</th>
+        <th>Year</th>
+        <th>Paid</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (childrenData && childrenData.length > 0) { %>
+        <% childrenData.forEach((student, index) => { %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= student['ï»¿Name'] %></td>
+            <td><%= student.Email %></td>
+            <td><%= student.Branch %></td>
+            <td><%= student.Section %></td>
+            <td><%= student.Year %></td>
+            <td><input type="checkbox" name="paid" data-email="<%= student.Email %>"></td>
+          </tr>
+        <% }); %>
+      <% } else { %>
+        <tr>
+          <td colspan="7">No student data available.</td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+
+  <script>
+    document.querySelectorAll('input[name="paid"]').forEach(function (checkbox) {
+      checkbox.addEventListener('change', function () {
+        const email = this.dataset.email;
+        if (this.checked) {
+          fetch('/generate-tokens', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: email }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log('Tokens generated:', data);
+            })
+            .catch((err) => {
+              console.error('Error generating tokens:', err);
+            });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
