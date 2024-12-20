@@ -15,7 +15,7 @@ app.set("view engine", "ejs");
 const db = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "Devang@22",
+  password: "g1234",
   database: "btech_students",
 });
 
@@ -33,7 +33,7 @@ app.get("/", (req, res) => {
 });
 
 // Route: Handle Login
-app.post("/login", (req, res) => {
+app.post("/login",  (req, res) => {
   const { email, password } = req.body;
 
   const query = "SELECT * FROM teachers WHERE email = ? AND password = ?";
@@ -47,6 +47,7 @@ app.post("/login", (req, res) => {
       const teacher = results[0];
       const tableName = `${teacher.year}y_${teacher.branch}_sec${teacher.section}`;
 
+
       const childrenQuery = `SELECT * FROM ${tableName}`;
       db.query(childrenQuery, (err, childrenData) => {
         if (err) {
@@ -59,7 +60,7 @@ app.post("/login", (req, res) => {
 
         res.render("dashboard", {
           teacher,
-          childrenData, // Pass data to the EJS view
+          childrenData, 
         });
       });
     } else {
@@ -67,6 +68,29 @@ app.post("/login", (req, res) => {
     }
   });
 });
+app.post("/updatePaidStatus", (req, res) => {
+  const { email, paid } = req.body;
+
+  // Convert 'paid' to 1 if checked (true), otherwise 0
+  const paidStatus = paid ? 1 : 0;
+  const tableName = '1y_cse_secb';
+  const query = `UPDATE ${tableName} SET isPay = ? WHERE email = ?`;
+
+  console.log("Query:", query, [paidStatus, email]);
+
+  db.query(query, [paidStatus, email], (err, results) => {
+    if (err) {
+      console.error("Error updating payment status:", err);
+      return res.status(500).json({ message: "Error updating payment status" });
+    }
+
+    console.log("Update Results:", results);
+
+    res.json("dashboard");
+  });
+});
+
+
 
 
 // Start Server
