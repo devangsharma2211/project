@@ -26,12 +26,20 @@
         <% childrenData.forEach((student, index) => { %>
           <tr>
             <td><%= index + 1 %></td>
-            <td><%= student['ï»¿Name'] %></td>
-            <td><%= student.Email %></td>
-            <td><%= student.Branch %></td>
-            <td><%= student.Section %></td>
-            <td><%= student.Year %></td>
-            <td><input type="checkbox" name="paid" data-email="<%= student.Email %>"></td>
+            <td><%= student.name %></td>
+            <td><%= student.email %></td>
+            <td><%= student.branch %></td>
+            <td><%= student.year %></td>
+            <td><%= student.section %></td>
+            <!-- <td><input type="checkbox" name="paid" data-email="<%= student.Email %>" ></td> -->
+             <td>
+              <!-- <input type="checkbox" class="paid-checkbox" data-email="<%= student.email %>" <%= student.isPay ?  'checked' : '' %>> -->
+              <form action="/updatePaidStatus" method="POST">
+                <input type="checkbox" name="paid" class="paid-checkbox" data-email="<%= student.email %>" value="1" <%= student.isPay ? 'checked' : '' %> onchange="this.form.submit()">
+                <input type="hidden" name="email" value="<%= student.email %>">
+              </form>
+              
+          </td>
           </tr>
         <% }); %>
       <% } else { %>
@@ -42,28 +50,7 @@
     </tbody>
   </table>
 
-  <script>
-    document.querySelectorAll('input[name="paid"]').forEach(function (checkbox) {
-      checkbox.addEventListener('change', function () {
-        const email = this.dataset.email;
-        if (this.checked) {
-          fetch('/generate-tokens', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email: email }),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              console.log('Tokens generated:', data);
-            })
-            .catch((err) => {
-              console.error('Error generating tokens:', err);
-            });
-        }
-      });
-    });
-  </script>
+ 
+
 </body>
 </html>
